@@ -2,7 +2,7 @@
 # from utils.database import (
 #     fetch_data_from_db, fetch_product_images, add_product_to_product_list,
 #     fetch_added_products, delete_product_from_added_products,
-#     fetch_image_details, delete_image, update_image_name, fetch_accessories_for_product, 
+#     fetch_image_details, delete_image, update_image_name, fetch_accessories_for_product,
 #     fetch_accessory_details, fetch_accessory_images, product_exists_in_product_list,
 #     add_accessory_to_product_list, check_accessory_exists
 # )
@@ -113,16 +113,16 @@
 #         with back_to_products_col:
 #             if st.button("Back to Products"):
 #                 st.session_state.pop('selected_product')
-#                 st.rerun() 
-        
+#                 st.rerun()
+
 #         st.markdown("---")
 
-        
+
 #         if images:
 #             num_columns = 4
 #             columns = st.columns(num_columns)
 #             image_details = fetch_image_details(db_name, product_code)
-            
+
 #             for idx, image in enumerate(images):
 #                 with columns[idx % num_columns]:
 #                     img_base64 = get_image_base64(image[0])
@@ -136,12 +136,12 @@
 #                         current_id, current_name = image_details[idx]
 #                     else:
 #                         current_id, current_name = None, ""
-                    
+
 #                     edit_col, delete_col = st.columns(2)
 #                     with edit_col:
 #                         if st.button(f"Edit Name", key=f"edit_name_{idx}"):
 #                             st.session_state[f"edit_{idx}"] = True
-                    
+
 #                     with delete_col:
 #                         if st.button(f"Delete Image", key=f"delete_image_{idx}"):
 #                             st.session_state[f"delete_{idx}"] = True
@@ -155,26 +155,26 @@
 #                             st.session_state[f"delete_{idx}"] = False
 #                         if st.button(f"Cancel Delete", key=f"cancel_delete_{idx}"):
 #                             st.session_state[f"delete_{idx}"] = False
-                    
+
 #                     if st.session_state.get(f"edit_{idx}", False):
 #                         new_name = st.text_input(f"Image Name", key=f"new_name_{idx}", value=current_name)
-                        
+
 #                         # Create two columns for "Save Name" and "Cancel" buttons
 #                         save_col, cancel_col = st.columns(2)
-                        
+
 #                         with save_col:
 #                             if st.button(f"Save Name", key=f"save_name_{idx}"):
 #                                 if current_id is not None:
 #                                     update_image_name(db_name, current_id, new_name)
 #                                     st.success(f"Image name updated successfully!")
 #                                 st.session_state[f"edit_{idx}"] = False
-                        
+
 #                         with cancel_col:
 #                             if st.button(f"Cancel", key=f"cancel_{idx}"):
 #                                 st.session_state[f"edit_{idx}"] = False
 #                     else:
 #                         st.write(current_name)
-                        
+
 #         st.markdown("---")
 
 #         st.markdown("## Accessories")
@@ -183,12 +183,12 @@
 #             for accessory_code in accessory_codes:
 #                 accessory_details = fetch_accessory_details(db_name, accessory_code)
 #                 accessory_images = fetch_accessory_images(db_name, accessory_code)
-                
+
 #                 if accessory_details:
 #                     st.markdown("<hr/>", unsafe_allow_html=True)
 #                     for idx, image in enumerate(accessory_images):
 #                         accessory_img, accessory_info, accessory_button = st.columns([1, 4, 1])
-                        
+
 #                         with accessory_img:
 #                             img_base64 = get_image_base64(image[0])
 #                             st.markdown(
@@ -197,7 +197,7 @@
 #                                 f"</div>",
 #                                 unsafe_allow_html=True,
 #                             )
-                        
+
 #                         with accessory_info:
 #                             st.markdown(f"""
 #                                 <div class="accessory-details-container">
@@ -206,7 +206,7 @@
 #                                     <p><strong>Technical Description:</strong> {accessory_details[3]}</p>
 #                                 </div>
 #                             """, unsafe_allow_html=True)
-                        
+
 #                         with accessory_button:
 #                             if st.button("Add Accessory", key=f"add_accessory_{accessory_code}_{idx}"):
 #                                 st.session_state['add_accessory'] = accessory_code
@@ -223,7 +223,7 @@
 #                             if st.button("View Accessory", key=f"view_accessory_{accessory_code}_{idx}"):
 #                                 st.session_state['view_accessory'] = accessory_code
 #                                 st.rerun()  # Rerun the main page
-                        
+
 #                 else:
 #                     st.markdown("No accessory details found.")
 #         else:
@@ -441,10 +441,10 @@
 #     main()
 
 import streamlit as st
+from utils.components import add_product_handler, display_added_products, view_product
 from utils.database import fetch_data_from_db, fetch_product_images
 from utils.image_utils import get_image_base64
 from utils.styles import load_css
-from utils.components import display_added_products, view_product, add_product_handler
 
 load_css()
 
@@ -459,14 +459,23 @@ if "added_products_rerun" not in st.session_state:
     st.session_state.added_products_rerun = False
 
 # Sidebar filters
-st.sidebar.markdown("<h1 style='text-align: center; padding-bottom: 40px;'>Product Filter</h1>", unsafe_allow_html=True)
+st.sidebar.markdown(
+    "<h1 style='text-align: center; padding-bottom: 40px;'>Product Filter</h1>",
+    unsafe_allow_html=True,
+)
 
 # Manufacturer filter
 databases = ["Iguzzini", "Linealight", "CDNLight", "PlusLight"]
-selected_manufacturers = st.sidebar.multiselect("Select Manufacturer(s)", databases, st.session_state.selected_manufacturers)
+selected_manufacturers = st.sidebar.multiselect(
+    "Select Manufacturer(s)", databases, st.session_state.selected_manufacturers
+)
 
-filter_text = st.sidebar.text_input("Filter text (comma-separated keywords)", st.session_state.filter_text)
-num_records = st.sidebar.number_input("Number of records to display", min_value=1, value=st.session_state.num_records)
+filter_text = st.sidebar.text_input(
+    "Filter text (comma-separated keywords)", st.session_state.filter_text
+)
+num_records = st.sidebar.number_input(
+    "Number of records to display", min_value=1, value=st.session_state.num_records
+)
 
 # Update session state variables on interaction
 if st.sidebar.button("Apply Filters"):
@@ -474,35 +483,48 @@ if st.sidebar.button("Apply Filters"):
     st.session_state.num_records = num_records
     st.session_state.selected_manufacturers = selected_manufacturers
 
-st.sidebar.markdown("---")
-
 # Fetch data based on filters
-keywords = [keyword.strip().lower() for keyword in filter_text.split(',') if keyword.strip()]
+keywords = [
+    keyword.strip().lower() for keyword in filter_text.split(",") if keyword.strip()
+]
 data = []
 for db in databases:
     db_data = fetch_data_from_db(db)
-    db_data_with_source = [(db, *row) for row in db_data if (not selected_manufacturers or db in selected_manufacturers)]
+    db_data_with_source = [
+        (db, *row)
+        for row in db_data
+        if (not selected_manufacturers or db in selected_manufacturers)
+    ]
     data.extend(db_data_with_source)
 
 filtered_data = []
 for row in data:
-    row_str = ' '.join(map(str, row)).lower()
+    row_str = " ".join(map(str, row)).lower()
     if all(keyword in row_str for keyword in keywords):
         filtered_data.append(row)
 
 display_data = filtered_data[:num_records]
 
+st.sidebar.markdown(
+    f"<h4 style='text-align: center;'>Available Products: {len(display_data)}</h4>",
+    unsafe_allow_html=True,
+)
+st.sidebar.markdown("---")
+
+
 def main_view():
     st.title("Product Viewer")
 
-    if 'selected_product' in st.session_state:
-        selected_product = st.session_state['selected_product']
+    if "selected_product" in st.session_state:
+        selected_product = st.session_state["selected_product"]
         view_product(selected_product)
 
     else:
         num_containers = len(display_data)
         num_columns = 3
-        num_columns_needed = num_containers // num_columns + (num_containers % num_columns > 0)
+        num_columns_needed = num_containers // num_columns + (
+            num_containers % num_columns > 0
+        )
         columns = [st.columns(num_columns) for _ in range(num_columns_needed)]
 
         for index, row in enumerate(display_data):
@@ -543,14 +565,20 @@ def main_view():
                 col1, col2 = st.columns(2)
                 with col1:
                     if st.button("View Product", key=f"view_product_{index}"):
-                        st.session_state['selected_product'] = row
+                        st.session_state["selected_product"] = row
                         st.experimental_rerun()
 
                 with col2:
-                    if st.button("Add Product", key=f"add_product_{index}", on_click=add_product_handler, args=(row,)):
+                    if st.button(
+                        "Add Product",
+                        key=f"add_product_{index}",
+                        on_click=add_product_handler,
+                        args=(row,),
+                    ):
                         st.session_state.added_products_rerun = True
 
         st.success("All containers created successfully!")
+
 
 def display_added_products_wrapper():
     if st.session_state.added_products_rerun:
@@ -558,9 +586,11 @@ def display_added_products_wrapper():
         st.rerun()
     display_added_products()
 
+
 def main():
     main_view()
     display_added_products_wrapper()
+
 
 if __name__ == "__main__":
     main()
